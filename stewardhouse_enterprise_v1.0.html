@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>StewardHouse — Institution Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:#F5F6F8;-webkit-font-smoothing:antialiased}
+input[type="range"]{-webkit-appearance:none;height:4px;background:#E2E8F0;border-radius:2px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#4A7C6F;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+select{-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px!important}
+input:not([type="range"]),textarea{outline:none;font-family:'DM Sans',sans-serif}
+input:not([type="range"]):focus,select:focus,textarea:focus{border-color:#4A7C6F!important}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.fade-in{animation:fadeIn .3s ease}
+.btn-press{transition:transform .1s}
+.btn-press:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+<div id="demo-nav" style="background:#0F1A2E;padding:6px 12px;display:flex;justify-content:center;gap:6px;align-items:center">
+  <span style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:0.1em;margin-right:4px">DEMO</span>
+  <a href="index.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Individual</a>
+  <a href="stewardhouse_enterprise_v1.0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:#4A7C6F;color:#fff;border:1px solid #4A7C6F">Enterprise</a>
+  <a href="stewardhouse_dashboard_v1.0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Dashboard</a>
+  <a href="stewardhouse_onboarding_v1.0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Setup</a>
+  <a href="stewardhouse_compliance_v1.0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Compliance</a>
+</div>
+<div id="root"></div>
+<script type="text/babel">
+const {useState} = React;
+
+const C={bg:"#F5F6F8",card:"#FFFFFF",navy:"#1A2744",teal:"#4A7C6F",tealLt:"#E8F0ED",bronze:"#8B7355",light:"#5A6370",muted:"#94A3B8",border:"#E2E8F0",cream:"#F5EDE3",sage:"#6B8F71",gold:"#C4956A",goldLt:"#FFF8F0",red:"#C53030",redLt:"#FFF5F5",amber:"#B7791F",amberLt:"#FFFBEB",green:"#2D6A4F",greenLt:"#EAFAF1"};
+const fn="'DM Sans',sans-serif";
+const sr="'Libre Baskerville',serif";
+
+var INST={sector:"Athletics",name:"State University",dept:"Athletic Department",contract:"Season Residency — Aug 2026 to May 2027",facilitator:"Faouzi Talabi",tier:"Revenue Sports Package",annual:"$85,000",endowment:"$8,500/yr"};
+
+
+function T(){
+  var s=(INST.sector||"Athletics");
+  var map={
+    Athletics:{p:"athletes",P:"Athletes",s:"athlete",S:"Athlete",admin:"Program Admin",comp:"Compliance Officer",ws:"workshop",WS:"Workshop",org:"Athletic Department",cert:"certified",Cert:"Certified"},
+    Music:{p:"artists",P:"Artists",s:"artist",S:"Artist",admin:"A&R Lead",comp:"Legal Team",ws:"session",WS:"Session",org:"Label",cert:"completed",Cert:"Completed"},
+    Entertainment:{p:"talent",P:"Talent",s:"talent member",S:"Talent",admin:"Talent Manager",comp:"Legal/Business Affairs",ws:"session",WS:"Session",org:"Agency",cert:"completed",Cert:"Completed"},
+    Creator:{p:"creators",P:"Creators",s:"creator",S:"Creator",admin:"Partnerships Lead",comp:"Brand Safety",ws:"workshop",WS:"Workshop",org:"Network",cert:"completed",Cert:"Completed"}
+  };
+  return map[s]||map.Athletics;
+}
+
+var INIT_ATH=[
+{id:1,nm:"Marcus Thompson",sp:"Basketball",yr:"Junior",pos:"Guard",gps:true,gd:"Sep 20",les:5,gi:3,la:"2d ago",st:"active",jd:"Aug 28",badge:"The Quiet Builder",cert:false,certDate:null},
+{id:2,nm:"Aaliyah Williams",sp:"Track & Field",yr:"Senior",pos:"400m",gps:true,gd:"Sep 15",les:7,gi:5,la:"1d ago",st:"active",jd:"Aug 25",badge:"The Amplifier",cert:true,certDate:"Nov 2, 2026"},
+{id:3,nm:"Devon Carter",sp:"Football",yr:"Sophomore",pos:"WR",gps:true,gd:"Oct 1",les:3,gi:1,la:"5d ago",st:"active",jd:"Aug 28",badge:"The Builder",cert:false,certDate:null},
+{id:4,nm:"Jasmine Okafor",sp:"Soccer",yr:"Junior",pos:"MF",gps:true,gd:"Sep 22",les:4,gi:2,la:"3d ago",st:"active",jd:"Aug 30",badge:"The Connector",cert:false,certDate:null},
+{id:5,nm:"Tyler Brooks",sp:"Basketball",yr:"Freshman",pos:"F",gps:false,gd:null,les:1,gi:0,la:"14d ago",st:"inactive",jd:"Sep 5",badge:null,cert:false,certDate:null},
+{id:6,nm:"Keisha Davis",sp:"Volleyball",yr:"Senior",pos:"Setter",gps:true,gd:"Sep 12",les:7,gi:4,la:"1d ago",st:"active",jd:"Aug 22",badge:"The Steward",cert:true,certDate:"Oct 28, 2026"},
+{id:7,nm:"Andre Mitchell",sp:"Football",yr:"Junior",pos:"LB",gps:true,gd:"Oct 5",les:2,gi:0,la:"21d ago",st:"inactive",jd:"Aug 28",badge:"The Learner",cert:false,certDate:null},
+{id:8,nm:"Sofia Reyes",sp:"Swimming",yr:"Sophomore",pos:"Free",gps:false,gd:null,les:0,gi:0,la:"Never",st:"invited",jd:null,badge:null,cert:false,certDate:null},
+{id:9,nm:"Chris Walker",sp:"Baseball",yr:"Senior",pos:"SS",gps:true,gd:"Sep 18",les:6,gi:3,la:"4d ago",st:"active",jd:"Aug 26",badge:"The Quiet Builder",cert:false,certDate:null},
+{id:10,nm:"Maya Johnson",sp:"Basketball",yr:"Freshman",pos:"G",gps:false,gd:null,les:0,gi:0,la:"Never",st:"invited",jd:null,badge:null,cert:false,certDate:null},
+{id:11,nm:"Elijah Brown",sp:"Football",yr:"Junior",pos:"CB",gps:true,gd:"Sep 28",les:4,gi:2,la:"7d ago",st:"active",jd:"Aug 28",badge:"The Builder",cert:false,certDate:null},
+{id:12,nm:"Destiny Clark",sp:"Softball",yr:"Senior",pos:"P",gps:true,gd:"Sep 10",les:7,gi:6,la:"Today",st:"active",jd:"Aug 20",badge:"The Steward",cert:true,certDate:"Oct 15, 2026"},
+{id:13,nm:"Jordan Lewis",sp:"Football",yr:"Senior",pos:"QB",gps:true,gd:"Sep 8",les:7,gi:4,la:"Today",st:"active",jd:"Aug 20",badge:"The Amplifier",cert:true,certDate:"Oct 10, 2026"},
+{id:14,nm:"Mia Chang",sp:"Tennis",yr:"Junior",pos:"Singles",gps:true,gd:"Oct 2",les:5,gi:2,la:"6d ago",st:"active",jd:"Sep 1",badge:"The Connector",cert:false,certDate:null},
+{id:15,nm:"DeSean Harris",sp:"Football",yr:"Sophomore",pos:"RB",gps:true,gd:"Oct 8",les:3,gi:1,la:"3d ago",st:"active",jd:"Sep 2",badge:"The Learner",cert:false,certDate:null},
+{id:16,nm:"Ava Petrova",sp:"Gymnastics",yr:"Freshman",pos:"AA",gps:false,gd:null,les:1,gi:0,la:"10d ago",st:"inactive",jd:"Sep 10",badge:null,cert:false,certDate:null},
+];
+
+var WORKSHOPS=[
+{id:1,date:"Sep 15, 2026",title:"Kickoff: Building Your GPS",status:"completed",attendees:14,notes:"Strong engagement. 3 athletes asked about DAFs."},
+{id:2,date:"Oct 20, 2026",title:"Giving Vehicles & Tax Strategy",status:"completed",attendees:12,notes:"2 absent (away game). Recording shared."},
+{id:3,date:"Nov 17, 2026",title:"Vetting Organizations",status:"upcoming",attendees:null,notes:""},
+{id:4,date:"Feb 16, 2027",title:"Year-End Review & Planning",status:"scheduled",attendees:null,notes:""},
+{id:5,date:"Apr 14, 2027",title:"Capstone: Reflection & Next Steps",status:"scheduled",attendees:null,notes:""},
+];
+
+var ENGAGEMENT=[35,42,50,48,58,62,55,67,72,64,70,75];
+
+function fK(n){if(n===undefined||n===null||isNaN(n))return"$0";if(n>=1000000)return"$"+(n/1000000).toFixed(1)+"M";if(n>=1000)return"$"+Math.round(n/1000)+"K";return"$"+Math.round(n).toLocaleString();}
+
+function Label(p){return<div style={{fontSize:10,color:C.bronze,fontFamily:fn,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{p.text}</div>}
+function Card(p){return<div className="fade-in" style={{background:C.card,borderRadius:14,padding:"16px",border:"1px solid "+C.border,marginBottom:10,cursor:p.onClick?"pointer":"default",...(p.style||{})}} onClick={p.onClick}>{p.children}</div>}
+function Btn(p){return<div className="btn-press" onClick={p.onClick} style={{padding:"12px 0",borderRadius:12,background:p.bg||C.teal,textAlign:"center",cursor:"pointer",border:p.border||"none",...(p.style||{})}}><span style={{fontSize:13,fontWeight:600,color:p.color||"#fff",fontFamily:fn}}>{p.children}</span></div>}
+function StatusDot(p){var c={active:C.green,inactive:C.amber,invited:C.muted}[p.status]||C.muted;return<div style={{width:8,height:8,borderRadius:"50%",background:c,flexShrink:0}}/>}
+function Bar(p){return<div style={{height:p.height||6,background:C.border,borderRadius:3,overflow:"hidden",flex:1,minWidth:40}}><div style={{width:Math.min((p.value||0)/(p.max||100)*100,100)+"%",height:"100%",background:p.color||C.teal,borderRadius:3,transition:"width .5s"}}/></div>}
+
+// ─── CERTIFICATE VIEW ───
+function Certificate(p) {
+  var a = p.athlete;
+  return <div className="fade-in" style={{background:"#FFFEF9",borderRadius:16,padding:"28px 24px",border:"2px solid "+C.gold,textAlign:"center",marginBottom:12}}>
+    <div style={{width:40,height:1,background:C.gold,margin:"0 auto 16px",opacity:.5}}/>
+    <div style={{fontSize:10,color:C.bronze,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:12}}>STEWARDHOUSE</div>
+    <div style={{fontSize:20,color:C.navy,fontFamily:sr,fontWeight:400,marginBottom:4}}>Program Completion Certificate</div>
+    <div style={{width:60,height:1,background:C.border,margin:"12px auto"}}/>
+    <div style={{fontSize:18,fontWeight:600,color:C.navy,fontFamily:fn,marginBottom:4}}>{a.nm}</div>
+    <div style={{fontSize:13,color:C.light}}>{a.sp} {"\u00B7"} {a.yr} {"\u00B7"} {INST.name}</div>
+    <div style={{width:60,height:1,background:C.border,margin:"16px auto"}}/>
+    <div style={{fontSize:12,color:C.light,lineHeight:1.7,maxWidth:340,margin:"0 auto",marginBottom:16}}>
+      Has successfully completed the StewardHouse Philanthropic Education Program, including the Giving Policy Statement and all seven core education modules.
+    </div>
+    <div style={{display:"flex",justifyContent:"center",gap:20,marginBottom:16}}>
+      <div><div style={{fontSize:11,color:C.muted}}>GPS completed</div><div style={{fontSize:13,fontWeight:600,color:C.teal}}>{a.gd||"N/A"}</div></div>
+      <div><div style={{fontSize:11,color:C.muted}}>Certified</div><div style={{fontSize:13,fontWeight:600,color:C.green}}>{a.certDate||"N/A"}</div></div>
+    </div>
+    <div style={{fontSize:10,color:C.muted,marginBottom:4}}>Certificate ID: SH-{String(a.id).padStart(4,"0")}-2026</div>
+    <div style={{fontSize:10,color:C.muted}}>Program facilitated by {INST.facilitator}</div>
+    <div style={{width:40,height:1,background:C.gold,margin:"16px auto 0",opacity:.5}}/>
+  </div>;
+}
+
+// ─── MODAL OVERLAY ───
+function Modal(p) {
+  if(!p.show) return null;
+  return <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.4)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:20}} onClick={p.onClose}>
+    <div className="fade-in" style={{background:C.card,borderRadius:16,padding:"24px 20px",maxWidth:480,width:"100%",maxHeight:"80vh",overflow:"auto"}} onClick={function(e){e.stopPropagation();}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <div style={{fontSize:16,fontWeight:600,color:C.navy}}>{p.title}</div>
+        <div onClick={p.onClose} style={{cursor:"pointer",fontSize:18,color:C.muted,padding:"4px 8px"}}>{"\u2715"}</div>
+      </div>
+      {p.children}
+    </div>
+  </div>;
+}
+
+// ─── ROI REPORT ───
+function ROIReport(p) {
+  var ath = p.athletes;
+  var tot = ath.length;
+  var costPerAthlete = Math.round(85000/tot);
+  var workshopAlt = 5000;
+  var totalHours = Math.round(ath.reduce(function(s,a){return s+a.les;},0)*0.35);
+  var certCount = ath.filter(function(a){return a.cert;}).length;
+
+  return <div>
+    <div style={{fontSize:14,fontWeight:600,color:C.navy,marginBottom:12}}>ROI analysis — Fall 2026</div>
+    <div style={{display:"flex",gap:8,marginBottom:14}}>
+      <div style={{flex:1,background:C.tealLt,borderRadius:10,padding:"14px",textAlign:"center",border:"1px solid "+C.teal}}>
+        <div style={{fontSize:22,fontWeight:700,color:C.teal}}>${costPerAthlete.toLocaleString()}</div>
+        <div style={{fontSize:10,color:C.sage}}>Cost per athlete</div>
+      </div>
+      <div style={{flex:1,background:C.bg,borderRadius:10,padding:"14px",textAlign:"center",border:"1px solid "+C.border}}>
+        <div style={{fontSize:22,fontWeight:700,color:C.muted}}>$5,000</div>
+        <div style={{fontSize:10,color:C.muted}}>One-time workshop</div>
+      </div>
+    </div>
+
+    <Card style={{background:C.navy}}>
+      <div style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,.6)",marginBottom:10}}>STEWARDHOUSE DELIVERS</div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+        {[{v:totalHours+"hrs",l:"Learning time"},{v:certCount+"",l:T().Cert},{v:"12",l:"Weeks of engagement"},{v:"5",l:"Workshops"}].map(function(s,i){return<div key={i}><div style={{fontSize:18,fontWeight:700,color:"#fff"}}>{s.v}</div><div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>{s.l}</div></div>;})}
+      </div>
+    </Card>
+
+    <Card>
+      <div style={{fontSize:12,fontWeight:600,color:C.navy,marginBottom:8}}>What a $5K workshop delivers</div>
+      {["2 hours of content, no follow-up","No measurable outcomes","No completion tracking","No giving education","No endowment pipeline","No data for your board"].map(function(item,i){return<div key={i} style={{display:"flex",gap:8,padding:"4px 0",alignItems:"center"}}>
+        <div style={{width:6,height:6,borderRadius:"50%",background:C.red,flexShrink:0}}/>
+        <span style={{fontSize:12,color:C.light}}>{item}</span>
+      </div>;})}
+    </Card>
+
+    <Card>
+      <div style={{fontSize:12,fontWeight:600,color:C.navy,marginBottom:8}}>What StewardHouse delivers at ${costPerAthlete.toLocaleString()}/athlete</div>
+      {["Year-round engagement with trackable results","Program Completion Certificate for compliance","Board-ready reporting with real data","Endowment pipeline that compounds after graduation","Required module integration alongside Title IX","10% of contract back to your endowment ("+INST.endowment+")"].map(function(item,i){return<div key={i} style={{display:"flex",gap:8,padding:"4px 0",alignItems:"center"}}>
+        <div style={{width:6,height:6,borderRadius:"50%",background:C.green,flexShrink:0}}/>
+        <span style={{fontSize:12,color:C.light}}>{item}</span>
+      </div>;})}
+    </Card>
+
+    <div style={{background:C.greenLt,borderRadius:10,padding:"12px",border:"1px solid "+C.green}}>
+      <div style={{fontSize:12,fontWeight:600,color:C.green,textAlign:"center"}}>StewardHouse costs {Math.round(85000/workshopAlt)}x a workshop but delivers 365 days of engagement, documented outcomes, and a self-sustaining endowment pipeline.</div>
+    </div>
+  </div>;
+}
+
+// ─── BOARD REPORT PREVIEW ───
+function BoardReport(p) {
+  var ath = p.athletes;
+  var tot = ath.length;
+  var gpsD = ath.filter(function(a){return a.gps;}).length;
+  var certD = ath.filter(function(a){return a.cert;}).length;
+  var tGi = ath.reduce(function(s,a){return s+a.gi;},0);
+
+  return <div>
+    <div style={{borderBottom:"2px solid "+C.navy,paddingBottom:10,marginBottom:14}}>
+      <div style={{fontSize:10,color:C.bronze,letterSpacing:"0.15em"}}>STEWARDHOUSE PROGRAM REPORT</div>
+      <div style={{fontSize:16,color:C.navy,fontFamily:sr,marginTop:4}}>{INST.name} — Fall 2026</div>
+      <div style={{fontSize:11,color:C.muted,marginTop:2}}>Prepared for institutional leadership</div>
+    </div>
+    <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:14}}>
+      In our first semester, {Math.round(gpsD/tot*100)}% of {tot} enrolled "+T().p+" completed their Giving Policy Statement. {certD} athletes earned their Program Completion Certificate. {tGi} charitable gifts were logged. Weekly engagement increased {Math.round((ENGAGEMENT[11]-ENGAGEMENT[0])/ENGAGEMENT[0]*100)}% from Week 1 to Week 12, demonstrating sustained behavioral change rather than one-time compliance.
+    </div>
+    <div style={{display:"flex",gap:8,marginBottom:14}}>
+      {[{v:tot,l:"Enrolled",c:C.navy},{v:gpsD,l:"GPS done",c:C.teal},{v:certD,l:T().Cert,c:C.green},{v:tGi,l:"Gifts logged",c:C.gold}].map(function(s,i){return<div key={i} style={{flex:1,background:C.bg,borderRadius:8,padding:"10px",textAlign:"center"}}><div style={{fontSize:18,fontWeight:700,color:s.c}}>{s.v}</div><div style={{fontSize:9,color:C.muted}}>{s.l}</div></div>;})}
+    </div>
+    <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:14}}>
+      At ${Math.round(85000/tot).toLocaleString()} per "+T().s+", the program costs less than a single team dinner while creating a lifetime giving pipeline. {INST.sector==="Athletics"?"StewardHouse has contributed "+INST.endowment+" to the athletic endowment through our 10% founding commitment.":"StewardHouse reinvests 10% of contract value into program development."}
+    </div>
+    <div style={{fontSize:11,color:C.muted,fontStyle:"italic",borderTop:"1px solid "+C.border,paddingTop:10}}>This data can be formatted with your institutional branding. StewardHouse provides the content. Your team packages it for your audience.</div>
+  </div>;
+}
+
+// ─── MAIN APP ───
+function Portal() {
+  
+  // Demo profiles
+  var DEMO_PROFILES = [
+    {id:"athletics",label:"State University (Athletics)",sector:"Athletics",name:"State University",dept:"Athletic Department",contract:"Season Residency \u2014 Aug 2026 to May 2027",facilitator:"Faouzi Talabi",tier:"Revenue Sports Package",annual:"$85,000",endowment:"$8,500/yr"},
+    {id:"music",label:"Harmony Records (Music)",sector:"Music",name:"Harmony Records",dept:"Artist Development",contract:"Annual Partnership \u2014 Jan 2027 to Dec 2027",facilitator:"Faouzi Talabi",tier:"Department-Wide Package",annual:"$150,000",endowment:"$15,000/yr"},
+    {id:"entertainment",label:"Apex Talent (Entertainment)",sector:"Entertainment",name:"Apex Talent Agency",dept:"Talent Management",contract:"Pilot Program \u2014 Oct 2026 to Mar 2027",facilitator:"Faouzi Talabi",tier:"Pilot Package",annual:"$25,000",endowment:"$2,500/yr"},
+    {id:"creator",label:"Creator Network X (Creator)",sector:"Creator",name:"Creator Network X",dept:"Creator Partnerships",contract:"Annual Partnership \u2014 Jan 2027 to Dec 2027",facilitator:"Faouzi Talabi",tier:"Revenue Package",annual:"$75,000",endowment:"$7,500/yr"},
+  ];
+  const [demoProfile,setDemoProfile] = useState("athletics");
+  
+  function switchDemo(id) {
+    var p = DEMO_PROFILES.find(function(d){return d.id===id});
+    if(p) {
+      INST.sector = p.sector;
+      INST.name = p.name;
+      INST.dept = p.dept;
+      INST.contract = p.contract;
+      INST.tier = p.tier;
+      INST.annual = p.annual;
+      INST.endowment = p.endowment;
+      setDemoProfile(id);
+      setTab("overview");
+    }
+  }
+
+  const [tab,setTab] = useState("overview");
+  const [athletes,setAthletes] = useState(INIT_ATH);
+  const [modal,setModal] = useState(null);
+  const [showAdd,setShowAdd] = useState(false);
+  const [newName,setNewName] = useState("");
+  const [newEmail,setNewEmail] = useState("");
+  const [newSport,setNewSport] = useState("");
+  const [search,setSearch] = useState("");
+  const [filter,setFilter] = useState("all");
+  const [sportF,setSportF] = useState("all");
+  const [selected,setSelected] = useState(null);
+  const [reportView,setReportView] = useState(null);
+  const [cSearch,setCSearch] = useState("");
+  const [cFilter,setCFilter] = useState("all");
+  const [cSportF,setCSportF] = useState("all");
+  const [showExcl,setShowExcl] = useState(false);
+  const [addingOrg,setAddingOrg] = useState(false);
+  const [cLookup,setCLookup] = useState(null);
+
+  var tot=athletes.length;
+  var active=athletes.filter(function(a){return a.st==="active"}).length;
+  var inactive=athletes.filter(function(a){return a.st==="inactive"}).length;
+  var invited=athletes.filter(function(a){return a.st==="invited"}).length;
+  var gpsD=athletes.filter(function(a){return a.gps}).length;
+  var certD=athletes.filter(function(a){return a.cert}).length;
+  var inProg=athletes.filter(function(a){return a.les>0&&!a.cert}).length;
+  var notStarted=athletes.filter(function(a){return a.les===0}).length;
+  var tGi=athletes.reduce(function(s,a){return s+a.gi},0);
+  var avgL=(athletes.reduce(function(s,a){return s+a.les},0)/tot).toFixed(1);
+  var sports=[];athletes.forEach(function(a){if(sports.indexOf(a.sp)===-1)sports.push(a.sp)});sports.sort();
+
+  var tabs=[{id:"overview",l:"Overview"},{id:"roster",l:"Roster"},{id:"reports",l:"Reports"},{id:"compliance",l:"Compliance"},{id:"program",l:"Program"}];
+
+  // ─── OVERVIEW ───
+  function renderOverview() {
+    return <div>
+      <Card style={{background:C.tealLt,border:"1px solid "+C.teal}}>
+        <div style={{fontSize:13,color:C.navy,lineHeight:1.5}}><span style={{fontWeight:600}}>Week 12 of your program.</span> {certD} athletes certified this month. {tGi} gifts logged. Engagement trending up.</div>
+      </Card>
+
+      <div style={{display:"flex",gap:8,marginBottom:10}}>
+        <div style={{flex:1,background:C.card,borderRadius:12,padding:"14px 10px",border:"1px solid "+C.border,textAlign:"center"}}><div style={{fontSize:24,fontWeight:700,color:C.navy}}>{tot}</div><div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginTop:2}}>Enrolled</div></div>
+        <div style={{flex:1,background:C.card,borderRadius:12,padding:"14px 10px",border:"1px solid "+C.border,textAlign:"center"}}><div style={{fontSize:24,fontWeight:700,color:C.teal}}>{Math.round(gpsD/tot*100)}%</div><div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginTop:2}}>GPS rate</div></div>
+        <div style={{flex:1,background:C.card,borderRadius:12,padding:"14px 10px",border:"1px solid "+C.border,textAlign:"center"}}><div style={{fontSize:24,fontWeight:700,color:C.green}}>{certD}</div><div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginTop:2}}>Certified</div></div>
+      </div>
+
+      <Card>
+        <Label text="MODULE COMPLETION"/>
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          {[{v:certD,l:"Certified",c:C.green,bg:C.greenLt},{v:inProg,l:"In progress",c:C.teal,bg:C.tealLt},{v:notStarted,l:"Not started",c:C.muted,bg:C.bg}].map(function(s,i){return<div key={i} style={{flex:1,background:s.bg,borderRadius:10,padding:"10px",textAlign:"center",border:"1px solid "+(s.c=== C.muted?C.border:s.c+"40")}}><div style={{fontSize:20,fontWeight:700,color:s.c}}>{s.v}</div><div style={{fontSize:9,color:s.c}}>{s.l}</div></div>;})}
+        </div>
+        <Bar value={certD+inProg} max={tot} color={C.teal} height={8}/>
+        <div style={{fontSize:11,color:C.light,marginTop:6}}>{Math.round((certD+inProg)/tot*100)}% on track. Assigned as required preseason module.</div>
+        <div style={{display:"flex",gap:8,marginTop:10}}>
+          <Btn onClick={function(){setModal("export")}} bg={C.card} color={C.teal} border={"1px solid "+C.teal} style={{flex:1}}>Export completion report</Btn>
+          <Btn onClick={function(){setModal("certs")}} bg={C.card} color={C.navy} border={"1px solid "+C.border} style={{flex:1}}>View certificates</Btn>
+        </div>
+      </Card>
+
+      <Card>
+        <Label text="ENGAGEMENT TREND"/>
+        <div style={{display:"flex",alignItems:"flex-end",gap:4,height:80}}>
+          {ENGAGEMENT.map(function(v,i){return<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+            <div style={{fontSize:8,color:C.muted}}>{v}%</div>
+            <div style={{width:"100%",height:v+"px",background:i===ENGAGEMENT.length-1?C.teal:C.tealLt,borderRadius:2}}/>
+            <span style={{fontSize:7,color:C.muted}}>W{i+1}</span>
+          </div>;})}
+        </div>
+        <div style={{fontSize:11,color:C.sage,marginTop:6}}>Up {Math.round((ENGAGEMENT[11]-ENGAGEMENT[0])/ENGAGEMENT[0]*100)}% since launch</div>
+      </Card>
+
+      <Card>
+        <Label text="WHERE TO FOCUS THIS WEEK"/>
+        {[
+          {dot:C.red,t:inactive+" athletes inactive 14+ days",s:athletes.filter(function(a){return a.st==="inactive"}).map(function(a){return a.nm}).join(", ")},
+          {dot:C.amber,t:invited+" invited but not started",s:athletes.filter(function(a){return a.st==="invited"}).map(function(a){return a.nm}).join(", ")},
+          {dot:C.green,t:certD+" earned certificates",s:athletes.filter(function(a){return a.cert}).map(function(a){return a.nm}).join(", ")},
+        ].map(function(item,i){return<div key={i} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:i<2?"1px solid "+C.border:"none",alignItems:"flex-start"}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:item.dot,flexShrink:0,marginTop:4}}/>
+          <div><div style={{fontSize:13,fontWeight:500,color:C.navy}}>{item.t}</div><div style={{fontSize:11,color:C.muted,marginTop:2}}>{item.s}</div></div>
+        </div>;})}
+      </Card>
+
+      <div style={{display:"flex",gap:8}}>
+        <Btn onClick={function(){setModal("board")}} style={{flex:1}}>Generate board report</Btn>
+        <Btn onClick={function(){setModal("digest")}} bg={C.card} color={C.bronze} border={"1px solid "+C.border} style={{flex:1}}>Email weekly digest</Btn>
+      </div>
+    </div>;
+  }
+
+  // ─── ROSTER ───
+  function renderRoster() {
+    if(selected) {
+      var a = selected;
+      var timeline=[];
+      if(a.les>=5)timeline.push({d:"Nov 10",t:"Completed: Giving publicly",tp:"lesson"});
+      if(a.gi>2)timeline.push({d:"Nov 5",t:"Logged a gift",tp:"gift"});
+      if(a.les>=4)timeline.push({d:"Oct 28",t:"Completed: Build your giving plan",tp:"lesson"});
+      if(a.gi>1)timeline.push({d:"Oct 20",t:"Logged a gift",tp:"gift"});
+      if(a.les>=3)timeline.push({d:"Oct 14",t:"Completed: Vetting",tp:"lesson"});
+      if(a.gi>0)timeline.push({d:"Oct 8",t:"Logged a gift",tp:"gift"});
+      if(a.les>=2)timeline.push({d:"Oct 2",t:"Completed: No-strings giving",tp:"lesson"});
+      if(a.gps)timeline.push({d:a.gd,t:"Completed GPS",tp:"gps"});
+      if(a.jd)timeline.push({d:a.jd,t:"Account created",tp:"start"});
+
+      return <div>
+        <div className="btn-press" onClick={function(){setSelected(null)}} style={{fontSize:13,color:C.teal,cursor:"pointer",marginBottom:14}}>{"\u2190"} Back to roster</div>
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div><div style={{fontSize:18,fontWeight:600,color:C.navy}}>{a.nm}</div><div style={{fontSize:13,color:C.muted}}>{a.sp} {"\u00B7"} {a.pos} {"\u00B7"} {a.yr}</div></div>
+            <div style={{display:"flex",alignItems:"center",gap:6}}><StatusDot status={a.st}/><span style={{fontSize:12,color:C.light,textTransform:"capitalize"}}>{a.st}</span></div>
+          </div>
+          <div style={{display:"flex",gap:8,marginTop:16}}>
+            {[{v:a.gps?"Done":"\u2014",l:"GPS",c:a.gps?C.teal:C.muted},{v:a.les+"/7",l:"Lessons",c:C.navy},{v:String(a.gi),l:"Gifts",c:a.gi>0?C.gold:C.muted},{v:a.la,l:"Last active",c:C.light}].map(function(x,i){return<div key={i} style={{flex:1,background:C.bg,borderRadius:10,padding:"10px 6px",textAlign:"center"}}><div style={{fontSize:16,fontWeight:700,color:x.c}}>{x.v}</div><div style={{fontSize:9,color:C.muted,textTransform:"uppercase"}}>{x.l}</div></div>;})}
+          </div>
+          {a.badge&&<div style={{marginTop:10,display:"inline-block",padding:"4px 12px",borderRadius:50,background:C.cream,border:"1px solid "+C.border}}><span style={{fontSize:11,color:C.bronze}}>{a.badge}</span></div>}
+          {a.gps&&<div style={{marginTop:10}}><div style={{fontSize:11,color:C.muted,marginBottom:4}}>Lesson progress</div><Bar value={a.les} max={7} color={a.les===7?C.green:C.teal} height={8}/></div>}
+          {a.cert&&<Btn onClick={function(){setModal("cert-"+a.id)}} bg={C.greenLt} color={C.green} border={"1px solid "+C.green} style={{marginTop:10}}>View certificate</Btn>}
+        </Card>
+        <Card style={{background:C.cream,border:"1px solid "+C.border}}>
+          <div style={{fontSize:12,fontWeight:600,color:C.bronze,marginBottom:4}}>Privacy boundary</div>
+          <div style={{fontSize:12,color:C.light,lineHeight:1.6}}>You see engagement metrics. You cannot see GPS content, gift amounts, gift recipients, or personal reflections.</div>
+        </Card>
+        <Card>
+          <Label text="ACTIVITY TIMELINE"/>
+          {timeline.length===0?<div style={{fontSize:12,color:C.muted,fontStyle:"italic"}}>No activity yet.</div>:
+          timeline.map(function(e,i){return<div key={i} style={{display:"flex",gap:12,padding:"8px 0",borderBottom:i<timeline.length-1?"1px solid "+C.border:"none"}}>
+            <div style={{fontSize:11,color:C.muted,width:50,flexShrink:0}}>{e.d}</div>
+            <div style={{width:8,height:8,borderRadius:"50%",marginTop:4,flexShrink:0,background:{gps:C.teal,gift:C.gold,lesson:C.navy,start:C.muted}[e.tp]||C.muted}}/>
+            <div style={{fontSize:13,color:C.navy}}>{e.t}</div>
+          </div>;})}
+        </Card>
+        <Btn onClick={function(){if(confirm("Remove "+a.nm+"? Their personal data stays in their account.")){setAthletes(athletes.filter(function(x){return x.id!==a.id}));setSelected(null);}}} bg={C.card} color={C.red} border={"1px solid "+C.red}>Remove from roster</Btn>
+      </div>;
+    }
+
+    var filtered=filter==="all"?athletes.slice():athletes.filter(function(a){return a.st===filter});
+    if(sportF!=="all")filtered=filtered.filter(function(a){return a.sp===sportF});
+    if(search)filtered=filtered.filter(function(a){return a.nm.toLowerCase().indexOf(search.toLowerCase())>=0||a.sp.toLowerCase().indexOf(search.toLowerCase())>=0});
+    filtered.sort(function(a,b){return a.nm<b.nm?-1:1});
+
+    return <div>
+      <div style={{position:"relative",marginBottom:10}}>
+        <input value={search} onChange={function(e){setSearch(e.target.value)}} placeholder={"Search "+T().p+"..."} style={{width:"100%",padding:"10px 14px 10px 36px",borderRadius:12,border:"1px solid "+C.border,fontSize:13,fontFamily:fn,background:C.card,boxSizing:"border-box"}}/>
+        <div style={{position:"absolute",left:12,top:11,fontSize:14,color:C.muted}}>{"\u2315"}</div>
+      </div>
+
+      <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+        {[{id:"all",l:"All ("+tot+")"},{id:"active",l:"Active ("+active+")"},{id:"inactive",l:"Inactive ("+inactive+")"},{id:"invited",l:"Invited ("+invited+")"}].map(function(f2){return<div key={f2.id} className="btn-press" onClick={function(){setFilter(f2.id)}} style={{padding:"5px 10px",borderRadius:50,cursor:"pointer",fontSize:11,fontWeight:600,background:filter===f2.id?C.navy:"transparent",color:filter===f2.id?"#fff":C.light,border:"1px solid "+(filter===f2.id?C.navy:C.border)}}>{f2.l}</div>;})}
+      </div>
+
+      <select value={sportF} onChange={function(e){setSportF(e.target.value)}} style={{padding:"5px 10px",borderRadius:8,border:"1px solid "+C.border,fontSize:11,fontFamily:fn,background:C.card,color:C.navy,marginBottom:8}}>
+        <option value="all">All sports</option>
+        {sports.map(function(s){return<option key={s} value={s}>{s}</option>})}
+      </select>
+
+      {/* Column headers */}
+      <div style={{display:"flex",alignItems:"center",padding:"0 14px 6px",gap:10}}>
+        <div style={{width:8}}/>
+        <div style={{flex:1,fontSize:10,color:C.muted,fontWeight:600}}>{(T().S||"").toUpperCase()}</div>
+        <div style={{width:36,textAlign:"center",fontSize:9,color:C.muted,fontWeight:600}}>GPS</div>
+        <div style={{width:40,textAlign:"center",fontSize:9,color:C.muted,fontWeight:600}}>LESSONS</div>
+        <div style={{width:32,textAlign:"center",fontSize:9,color:C.muted,fontWeight:600}}>GIFTS</div>
+        <div style={{width:14}}/>
+      </div>
+
+      {filtered.map(function(a){return<div key={a.id} className="btn-press" onClick={function(){setSelected(a)}} style={{background:C.card,borderRadius:12,padding:"12px 14px",border:"1px solid "+C.border,marginBottom:4,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
+        <StatusDot status={a.st}/>
+        <div style={{flex:1,minWidth:0}}><div style={{fontSize:14,fontWeight:500,color:C.navy}}>{a.nm}</div><div style={{fontSize:11,color:C.muted}}>{a.sp} {"\u00B7"} {a.yr}</div></div>
+        <div style={{width:36,textAlign:"center"}}><div style={{fontSize:12,fontWeight:600,color:a.gps?C.teal:C.muted}}>{a.gps?"\u2713":"\u2014"}</div></div>
+        <div style={{width:40,textAlign:"center"}}><div style={{fontSize:12,fontWeight:600,color:C.navy}}>{a.les}/7</div></div>
+        <div style={{width:32,textAlign:"center"}}><div style={{fontSize:12,fontWeight:600,color:a.gi>0?C.gold:C.muted}}>{a.gi}</div></div>
+        <div style={{color:C.muted,fontSize:14}}>{"\u2192"}</div>
+      </div>;})}
+
+      <div style={{textAlign:"center",marginTop:8,fontSize:12,color:C.muted}}>Showing {filtered.length} of {tot}</div>
+
+      {!showAdd?<div className="btn-press" onClick={function(){setShowAdd(true)}} style={{marginTop:12,padding:"12px",borderRadius:12,border:"2px dashed "+C.teal,textAlign:"center",cursor:"pointer"}}><span style={{fontSize:13,fontWeight:600,color:C.teal}}>+ Add athlete to roster</span></div>
+      :<Card>
+        <Label text={"ADD "+(T().S||"").toUpperCase()}/>
+        <input value={newName} onChange={function(e){setNewName(e.target.value)}} placeholder="Name" style={{width:"100%",padding:"10px 14px",borderRadius:10,border:"1px solid "+C.border,fontSize:13,marginBottom:8,background:C.card,boxSizing:"border-box"}}/>
+        <input value={newEmail} onChange={function(e){setNewEmail(e.target.value)}} placeholder="Email" style={{width:"100%",padding:"10px 14px",borderRadius:10,border:"1px solid "+C.border,fontSize:13,marginBottom:8,background:C.card,boxSizing:"border-box"}}/>
+        <input value={newSport} onChange={function(e){setNewSport(e.target.value)}} placeholder="Sport" style={{width:"100%",padding:"10px 14px",borderRadius:10,border:"1px solid "+C.border,fontSize:13,marginBottom:10,background:C.card,boxSizing:"border-box"}}/>
+        <div style={{display:"flex",gap:8}}>
+          <Btn onClick={function(){if(newName.trim()&&newEmail.trim()){setAthletes(athletes.concat([{id:Date.now(),nm:newName.trim(),sp:newSport||"TBD",yr:"Freshman",pos:"",gps:false,gd:null,les:0,gi:0,la:"Never",st:"invited",jd:null,badge:null,cert:false,certDate:null}]));setNewName("");setNewEmail("");setNewSport("");setShowAdd(false);}}} style={{flex:1}}>Add and send invitation</Btn>
+          <Btn onClick={function(){setShowAdd(false)}} bg={C.card} color={C.light} border={"1px solid "+C.border} style={{flex:0}}>Cancel</Btn>
+        </div>
+      </Card>}
+    </div>;
+  }
+
+  // ─── REPORTS ───
+  function renderReports() {
+    if(reportView) {
+      return <div>
+        <div className="btn-press" onClick={function(){setReportView(null)}} style={{fontSize:13,color:C.teal,cursor:"pointer",marginBottom:14}}>{"\u2190"} Back to reports</div>
+        {reportView==="summary"&&<div>
+          <Card><div style={{fontSize:16,fontWeight:600,color:C.navy,marginBottom:8}}>Program summary — Fall 2026</div>
+          <div style={{fontSize:13,color:C.light,lineHeight:1.7}}>In our first semester, {Math.round(gpsD/tot*100)}% of {tot} enrolled "+T().p+" completed their Giving Policy Statement. {certD} earned their Program Completion Certificate. {tGi} gifts logged. Engagement increased {Math.round((ENGAGEMENT[11]-ENGAGEMENT[0])/ENGAGEMENT[0]*100)}% from Week 1 to Week 12, demonstrating sustained habits rather than one-time compliance. At ${Math.round(85000/tot).toLocaleString()} per athlete, the program costs less than a team dinner while building a lifetime giving pipeline.</div></Card>
+          <Btn onClick={function(){setModal("copied")}} bg={C.card} color={C.teal} border={"1px solid "+C.teal}>Copy summary text</Btn>
+        </div>}
+        {reportView==="cohort"&&<div>
+          <div style={{fontSize:16,fontWeight:600,color:C.navy,marginBottom:12}}>Cohort comparison</div>
+          {(function(){var bs={};athletes.forEach(function(a){if(!bs[a.sp])bs[a.sp]={c:0,g:0,l:0,gi:0,cert:0};bs[a.sp].c++;if(a.gps)bs[a.sp].g++;bs[a.sp].l+=a.les;bs[a.sp].gi+=a.gi;if(a.cert)bs[a.sp].cert++});return Object.entries(bs).sort(function(a,b){return b[1].c-a[1].c}).map(function(e){var sp=e[0],d=e[1];return<Card key={sp}><div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}><div style={{fontSize:14,fontWeight:600,color:C.navy}}>{sp}</div><div style={{fontSize:12,color:C.muted}}>{d.c} athletes</div></div><div style={{display:"flex",gap:8}}><div style={{flex:1}}><div style={{fontSize:10,color:C.muted}}>GPS</div><div style={{fontSize:16,fontWeight:600,color:C.teal}}>{Math.round(d.g/d.c*100)}%</div></div><div style={{flex:1}}><div style={{fontSize:10,color:C.muted}}>Avg lessons</div><div style={{fontSize:16,fontWeight:600,color:C.navy}}>{(d.l/d.c).toFixed(1)}</div></div><div style={{flex:1}}><div style={{fontSize:10,color:C.muted}}>Certified</div><div style={{fontSize:16,fontWeight:600,color:C.green}}>{d.cert}</div></div><div style={{flex:1}}><div style={{fontSize:10,color:C.muted}}>Gifts</div><div style={{fontSize:16,fontWeight:600,color:C.gold}}>{d.gi}</div></div></div></Card>})})()}
+        </div>}
+        {reportView==="readiness"&&<div>
+          <div style={{fontSize:16,fontWeight:600,color:C.navy,marginBottom:4}}>Philanthropic readiness</div>
+          <div style={{fontSize:12,color:C.muted,marginBottom:12}}>GPS (30%) + Lessons (40%) + Giving (30%)</div>
+          {athletes.filter(function(a){return a.gps}).map(function(a){var sc=Math.round((a.gps?30:0)+(a.les/7*40)+(Math.min(a.gi,5)/5*30));return{nm:a.nm,sp:a.sp,sc:sc,cert:a.cert}}).sort(function(a,b){return b.sc-a.sc}).map(function(a,i){var cl=a.sc>=80?C.green:a.sc>=50?C.teal:C.amber;return<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid "+C.border}}>
+            <div style={{width:36,height:36,borderRadius:"50%",background:cl+"18",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><span style={{fontSize:13,fontWeight:700,color:cl}}>{a.sc}</span></div>
+            <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:C.navy}}>{a.nm}{a.cert?" \u2713":""}</div><div style={{fontSize:11,color:C.muted}}>{a.sp}</div></div>
+            <Bar value={a.sc} max={100} color={cl}/>
+          </div>})}
+        </div>}
+        {reportView==="roi"&&<ROIReport athletes={athletes}/>}
+        {reportView==="snapshot"&&<div>
+          <div style={{fontSize:16,fontWeight:600,color:C.navy,marginBottom:8}}>Endowment snapshot</div>
+          <Card style={{background:C.navy,border:"none"}}>
+            <div style={{fontSize:10,color:"rgba(255,255,255,.5)",letterSpacing:"0.1em",textTransform:"uppercase"}}>PROJECTED CORPUS AT YEAR 10</div>
+            <div style={{fontSize:32,fontWeight:700,color:"#fff",marginTop:4}}>$14.8M</div>
+            <div style={{fontSize:12,color:C.tealLt,marginTop:4}}>Annual draw: $667K/yr at 4.5%</div>
+            <div style={{display:"flex",gap:12,marginTop:14}}>
+              {[{v:"$8.5K",l:"StewardHouse 10%"},{v:"$450K",l:"Corporate sponsors"},{v:"$9M",l:"Major donors"},{v:"$187K",l:"Alumni pipeline"}].map(function(s,i){return<div key={i}><div style={{fontSize:14,fontWeight:600,color:i===0?C.tealLt:"#fff"}}>{s.v}</div><div style={{fontSize:8,color:"rgba(255,255,255,.4)"}}>{s.l}</div></div>})}
+            </div>
+          </Card>
+          <div style={{fontSize:11,color:C.muted,textAlign:"center",marginTop:4}}>Based on assumptions provided during strategic planning session. Not financial advice.</div>
+          <Btn onClick={function(){setModal("copied")}} bg={C.card} color={C.teal} border={"1px solid "+C.teal} style={{marginTop:10}}>Copy snapshot for presentation</Btn>
+        </div>}
+      </div>;
+    }
+
+    return <div>
+      <Label text="REPORTS"/>
+      {[
+        {id:"summary",t:"Program summary",d:"Narrative with key metrics. Copy-paste ready for your leadership."},
+        {id:"cohort",t:"Cohort comparison",d:"By sport: GPS rate, lessons, certifications, gifts."},
+        {id:"readiness",t:"Philanthropic readiness",d:"Individual scores. GPS + lessons + giving."},
+        {id:"roi",t:"ROI analysis",d:"Cost per "+T().s+" vs. "+T().ws+". Budget justification."},
+        (INST.sector==="Athletics"?{id:"snapshot",t:"Endowment snapshot",d:"Current projection for board presentations."}:{id:"snapshot",t:"Impact summary",d:"Program outcomes for leadership presentations."}),
+      ].map(function(r){return<Card key={r.id} className="btn-press" onClick={function(){setReportView(r.id)}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div><div style={{fontSize:14,fontWeight:600,color:C.navy}}>{r.t}</div><div style={{fontSize:12,color:C.light,marginTop:4}}>{r.d}</div></div>
+          <div className="btn-press" style={{padding:"6px 12px",borderRadius:8,background:C.tealLt,border:"1px solid "+C.teal}}><span style={{fontSize:11,fontWeight:600,color:C.teal}}>View</span></div>
+        </div>
+      </Card>})}
+      <Card style={{background:C.cream}}><div style={{fontSize:11,color:C.bronze,lineHeight:1.6}}>Reports contain aggregate data only. No individual GPS content, gift amounts, or personal reflections. Your team formats these for your audience.</div></Card>
+    </div>;
+  }
+
+  // ─── PROGRAM ───
+  function renderProgram() {
+    return <div>
+      <div style={{background:C.tealLt,borderRadius:8,padding:"8px 12px",border:"1px solid "+C.teal,marginBottom:12,display:"flex",alignItems:"center",gap:8}}>
+        <div style={{width:8,height:8,borderRadius:"50%",background:C.green}}/>
+        <span style={{fontSize:12,fontWeight:600,color:C.teal}}>Assigned as required preseason module</span>
+      </div>
+
+      <Card>
+        <Label text="CONTRACT"/>
+        {[{l:"Institution",v:INST.name},{l:"Department",v:INST.dept},{l:"Contract",v:INST.contract},{l:"Tier",v:INST.tier},{l:"Annual",v:INST.annual},{l:"Facilitator",v:INST.facilitator},(INST.sector==="Athletics"?{l:"Endowment (10%)",v:INST.endowment,accent:true}:{l:"StewardHouse 10%",v:"Reinvested in your program",accent:true})].map(function(item,i){return<div key={i} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:i<6?"1px solid "+C.border:"none"}}><span style={{fontSize:13,color:C.light}}>{item.l}</span><span style={{fontSize:13,fontWeight:500,color:item.accent?C.teal:C.navy}}>{item.v}</span></div>})}
+      </Card>
+
+      <Card>
+        <Label text="WORKSHOPS"/>
+        {WORKSHOPS.map(function(w,i){return<div key={i} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:i<WORKSHOPS.length-1?"1px solid "+C.border:"none",alignItems:"flex-start"}}>
+          <StatusDot status={w.status==="completed"?"active":w.status==="upcoming"?"inactive":"invited"}/>
+          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:C.navy}}>{w.title}</div><div style={{fontSize:11,color:C.muted}}>{w.date}{w.attendees?" \u00B7 "+w.attendees+" attended":""}</div>{w.notes&&w.status==="completed"&&<div style={{fontSize:11,color:C.light,marginTop:4,fontStyle:"italic"}}>{w.notes}</div>}</div>
+          <span style={{fontSize:10,color:w.status==="completed"?C.green:w.status==="upcoming"?C.amber:C.muted,textTransform:"capitalize",fontWeight:500}}>{w.status}</span>
+        </div>})}
+      </Card>
+
+      {/* Quarterly refinement */}
+      <Card>
+        <Label text="QUARTERLY PROGRAM REVIEW"/>
+        <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:14}}>Each quarter, StewardHouse delivers a refinement summary showing what happened, what we adjusted, and what is planned next. This is how we earn the partnership every 90 days.</div>
+
+        {[{q:"Q1 (Aug-Oct)",status:"complete",delivered:"Onboarding complete. Roster enrolled. 2 "+T().ws+"s delivered. GPS completion at "+Math.round(gpsD/tot*100)+"%.",adjusted:"Extended enrollment window by 2 weeks for late additions. Added extra check-in for inactive "+T().p+".",next:"Vetting "+T().ws+" in November. Mid-semester engagement push. First completion report."},{q:"Q2 (Nov-Jan)",status:"current",delivered:"In progress. 3rd "+T().ws+" upcoming. "+certD+" "+T().p+" "+T().cert+".",adjusted:"Shifted "+T().ws+" 3 content to focus on vetting after cohort feedback.",next:"Year-end review "+T().ws+". Pull semester completion data. Prep renewal materials."},{q:"Q3 (Feb-Apr)",status:"upcoming",delivered:"",adjusted:"",next:"Spring "+T().ws+"s. Capstone session. Graduating "+T().s+" transition prep."},{q:"Q4 (May-Jul)",status:"upcoming",delivered:"",adjusted:"",next:"Annual review. Contract renewal conversation. Next year planning."}].map(function(item,i){
+          var isCurrent = item.status === "current";
+          var isComplete = item.status === "complete";
+          return <Card key={i} style={{border:"1px solid "+(isCurrent?C.teal:isComplete?C.green:C.border),background:isCurrent?C.tealLt:"transparent"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <div style={{fontSize:14,fontWeight:600,color:C.navy}}>{item.q}</div>
+              <div style={{padding:"3px 10px",borderRadius:50,background:isComplete?C.greenLt:isCurrent?C.tealLt:C.bg,border:"1px solid "+(isComplete?C.green:isCurrent?C.teal:C.border)}}>
+                <span style={{fontSize:10,fontWeight:600,color:isComplete?C.green:isCurrent?C.teal:C.muted,textTransform:"capitalize"}}>{item.status}</span>
+              </div>
+            </div>
+            {item.delivered&&<div style={{marginBottom:8}}><div style={{fontSize:10,color:C.bronze,fontWeight:600,marginBottom:2}}>DELIVERED</div><div style={{fontSize:12,color:C.light,lineHeight:1.6}}>{item.delivered}</div></div>}
+            {item.adjusted&&<div style={{marginBottom:8}}><div style={{fontSize:10,color:C.bronze,fontWeight:600,marginBottom:2}}>ADJUSTED</div><div style={{fontSize:12,color:C.light,lineHeight:1.6}}>{item.adjusted}</div></div>}
+            {item.next&&<div><div style={{fontSize:10,color:C.bronze,fontWeight:600,marginBottom:2}}>{isComplete||isCurrent?"NEXT QUARTER":"PLANNED"}</div><div style={{fontSize:12,color:C.light,lineHeight:1.6}}>{item.next}</div></div>}
+          </Card>;
+        })}
+
+        <div style={{fontSize:11,color:C.muted,fontStyle:"italic",textAlign:"center",marginTop:4}}>Quarterly reviews are part of every StewardHouse partnership. This is how we demonstrate ongoing value and refine the program to your needs.</div>
+      </Card>
+
+      <Card>
+        <Label text="HOW STEWARDHOUSE ENHANCES YOUR TEAM"/>
+        <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:12}}>StewardHouse does not replace your team. It enhances every function your staff already performs. The humans stay. The work gets better.</div>
+        {[{item:"Financial literacy workshops",yours:"Your staff delivers",ours:"StewardHouse provides structured curriculum, facilitation, and measurable outcomes"},{item:"Alumni engagement",yours:"Your development office manages",ours:"StewardHouse builds the giving habit before graduation so alumni arrive pre-engaged"},{item:"Giving education",yours:"Your life skills program covers",ours:"StewardHouse adds 7-lesson depth with GPS, nonprofit discovery, and giving vehicles"},{item:"Endowment strategy",yours:"Your advancement team leads",ours:"StewardHouse provides projection modeling and alumni pipeline data to inform strategy"},{item:"Data and reporting",yours:"Your team compiles manually",ours:"StewardHouse generates real-time engagement data, completion tracking, and board-ready exports"}].map(function(row,i){return<div key={i} style={{padding:"10px 0",borderBottom:i<4?"1px solid "+C.border:"none"}}>
+          <div style={{fontSize:13,fontWeight:600,color:C.navy,marginBottom:4}}>{row.item}</div>
+          <div style={{fontSize:11,color:C.muted,marginBottom:2}}><span style={{fontWeight:600}}>Your team:</span> {row.yours}</div>
+          <div style={{fontSize:11,color:C.teal}}><span style={{fontWeight:600}}>StewardHouse enhances:</span> {row.ours}</div>
+        </div>})}
+        <div style={{background:C.tealLt,borderRadius:8,padding:"10px",border:"1px solid "+C.teal,marginTop:8}}><div style={{fontSize:12,fontWeight:600,color:C.teal,textAlign:"center"}}>Nobody loses their job. Everyone gets better at it.</div></div>
+      </Card>
+
+      {INST.sector==="Athletics"
+        ?<Card style={{background:C.goldLt,border:"1px solid "+C.border}}>
+          <Label text="ENDOWMENT COMMITMENT"/>
+          <div style={{fontSize:13,color:C.light,lineHeight:1.6}}>10% of your annual contract ({INST.endowment}) contributes directly to your athletic endowment. Cumulative: <span style={{fontWeight:600,color:C.teal}}>$8,500</span>.</div>
+        </Card>
+        :<Card style={{background:C.goldLt,border:"1px solid "+C.border}}>
+          <Label text="PROGRAM REINVESTMENT"/>
+          <div style={{fontSize:13,color:C.light,lineHeight:1.6}}>10% of your annual contract is reinvested into program development, content expansion, and impact measurement for your {T().p}. This is a founding commitment from StewardHouse.</div>
+        </Card>}
+    </div>;
+  }
+
+
+  // ─── COMPLIANCE ───
+  function renderCompliance() {
+
+    var excl = [{id:1,name:"Booster Club Foundation",ein:"04-9912345",reason:"Booster connection",flagged:"Sep 15, 2026"},{id:2,name:"Meridian Community Fund",ein:"04-7781234",reason:"Conflict of interest",flagged:"Sep 20, 2026"},{id:3,name:"Victory Sports Fund",ein:"04-5534567",reason:"Booster connection",flagged:"Oct 1, 2026"}];
+
+    var pct=Math.round(certD/tot*100);
+    var statusColor=pct>=80?C.green:pct>=50?C.amber:C.red;
+    var statusBg=pct>=80?C.greenLt:pct>=50?C.amberLt:C.redLt;
+    var overdue=athletes.filter(function(a){return a.st==="inactive"||a.st==="invited"}).length;
+
+    var cFiltered=cFilter==="all"?athletes.slice():cFilter==="certified"?athletes.filter(function(a){return a.cert}):cFilter==="incomplete"?athletes.filter(function(a){return!a.cert&&a.les>0}):cFilter==="notstarted"?athletes.filter(function(a){return a.les===0}):athletes.filter(function(a){return a.st==="inactive"||a.st==="invited"});
+    if(cSportF!=="all")cFiltered=cFiltered.filter(function(a){return a.sp===cSportF});
+    if(cSearch)cFiltered=cFiltered.filter(function(a){return a.nm.toLowerCase().indexOf(cSearch.toLowerCase())>=0});
+
+    return <div>
+      {/* Status bar */}
+      <div style={{background:statusBg,borderRadius:14,padding:"18px",border:"1px solid "+statusColor,marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div><div style={{fontSize:20,fontWeight:700,color:statusColor}}>{certD} of {tot} certified</div><div style={{fontSize:12,color:statusColor}}>{overdue>0?overdue+" overdue":"All on track"}</div></div>
+          <div style={{width:48,height:48,borderRadius:"50%",background:statusColor,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:16,fontWeight:700,color:"#fff"}}>{pct}%</span></div>
+        </div>
+        <div style={{height:8,background:"rgba(255,255,255,.5)",borderRadius:4,marginTop:12,overflow:"hidden"}}><div style={{display:"flex",height:"100%"}}><div style={{width:Math.round(certD/tot*100)+"%",background:C.green}}/><div style={{width:Math.round(inProg/tot*100)+"%",background:C.teal}}/></div></div>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:10,color:statusColor}}><span>{certD} certified</span><span>{inProg} in progress</span><span>{notStarted} not started</span></div>
+      </div>
+
+      <div style={{background:C.card,borderRadius:12,padding:"10px 14px",border:"1px solid "+C.border,marginBottom:14,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:8,height:8,borderRadius:"50%",background:C.green}}/><span style={{fontSize:13,color:C.navy}}>All 7 modules approved</span></div><span style={{fontSize:11,color:C.muted}}>Sep 1, 2026</span></div>
+
+      {/* Search and filters */}
+      <div style={{position:"relative",marginBottom:8}}><input value={cSearch} onChange={function(e){setCSearch(e.target.value)}} placeholder={"Search "+T().s+"..."} style={{width:"100%",padding:"10px 14px 10px 36px",borderRadius:12,border:"1px solid "+C.border,fontSize:13,fontFamily:fn,background:C.card,boxSizing:"border-box"}}/><div style={{position:"absolute",left:12,top:11,fontSize:14,color:C.muted}}>{"\u2315"}</div></div>
+
+      <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+        {[{id:"all",l:"All ("+tot+")"},{id:"certified",l:"Certified ("+certD+")"},{id:"incomplete",l:"In progress ("+inProg+")"},{id:"notstarted",l:"Not started ("+notStarted+")"},{id:"overdue",l:"Overdue ("+overdue+")"}].map(function(f){return<div key={f.id} className="btn-press" onClick={function(){setCFilter(f.id)}} style={{padding:"5px 10px",borderRadius:50,cursor:"pointer",fontSize:11,fontWeight:600,background:cFilter===f.id?C.navy:"transparent",color:cFilter===f.id?"#fff":C.light,border:"1px solid "+(cFilter===f.id?C.navy:C.border)}}>{f.l}</div>})}
+      </div>
+
+      <select value={cSportF} onChange={function(e){setCSportF(e.target.value)}} style={{padding:"5px 10px",borderRadius:8,border:"1px solid "+C.border,fontSize:11,fontFamily:fn,background:C.card,color:C.navy,marginBottom:8}}><option value="all">All sports</option>{sports.map(function(s){return<option key={s} value={s}>{s}</option>})}</select>
+
+      {/* Compliance roster */}
+      <div style={{display:"flex",alignItems:"center",padding:"0 14px 6px",gap:10}}><div style={{width:8}}/><div style={{flex:1,fontSize:10,color:C.muted,fontWeight:600}}>{(T().S||"").toUpperCase()}</div><div style={{width:40,textAlign:"center",fontSize:9,color:C.muted,fontWeight:600}}>STATUS</div><div style={{width:40,textAlign:"center",fontSize:9,color:C.muted,fontWeight:600}}>LESSONS</div></div>
+
+      {cFiltered.map(function(a){var isOD=a.st==="inactive"||a.st==="invited";return<div key={a.id} style={{background:C.card,borderRadius:10,padding:"10px 14px",border:"1px solid "+(isOD?C.red+"40":C.border),marginBottom:4,display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:8,height:8,borderRadius:"50%",background:a.cert?C.green:isOD?C.red:a.les>0?C.teal:C.muted,flexShrink:0}}/>
+        <div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:500,color:C.navy}}>{a.nm}</div><div style={{fontSize:11,color:C.muted}}>{a.sp} {"\u00B7"} {a.yr}</div></div>
+        <div style={{width:40,textAlign:"center"}}><div style={{fontSize:12,fontWeight:600,color:a.cert?C.green:isOD?C.red:C.navy}}>{a.cert?"Done":isOD?"Late":"OK"}</div></div>
+        <div style={{width:40,textAlign:"center"}}><div style={{fontSize:12,fontWeight:600,color:C.navy}}>{a.les}/7</div></div>
+      </div>})}
+
+      {/* Pre-launch checklist */}
+      <Card style={{background:C.cream,border:"1px solid "+C.border}}>
+        <Label text="PRE-LAUNCH CHECKLIST"/>
+        <div style={{fontSize:12,color:C.light,marginBottom:10,lineHeight:1.6}}>All items must be completed before the program goes live. This is a one-time review per contract period.</div>
+        {[
+          {id:"modules",label:"All 7 lesson modules reviewed and approved",done:true},
+          {id:"orgs",label:"Initial organization exclusion list reviewed",done:true},
+          {id:"data",label:"Data collection and retention policy confirmed",done:true},
+          {id:"ncaa",label:INST.sector==="Athletics"?"NCAA disclosure policy reviewed":"Privacy and data handling policy reviewed",done:true},
+          {id:"roster",label:"Roster uploaded and enrollment emails queued",done:true},
+          {id:"signoff",label:"Program launch authorized by "+T().comp,done:true},
+        ].map(function(item,i){return<div key={i} style={{display:"flex",gap:10,alignItems:"center",padding:"8px 0",borderBottom:i<5?"1px solid "+C.border:"none"}}>
+          <div style={{width:20,height:20,borderRadius:4,background:item.done?C.greenLt:C.bg,border:"1.5px solid "+(item.done?C.green:C.border),display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{item.done&&<span style={{fontSize:10,color:C.green}}>{"✓"}</span>}</div>
+          <div style={{fontSize:12,color:item.done?C.navy:C.muted}}>{item.label}</div>
+        </div>})}
+        <div style={{marginTop:10,background:C.greenLt,borderRadius:8,padding:"10px",border:"1px solid "+C.green}}>
+          <div style={{fontSize:12,fontWeight:600,color:C.green}}>All pre-launch requirements met.</div>
+          <div style={{fontSize:11,color:C.sage,marginTop:2}}>Signed off Sep 1, 2026. Program active.</div>
+        </div>
+      </Card>
+
+      {/* Tools */}
+      <div style={{marginTop:16}}>
+        <Btn onClick={function(){setModal("export")}} bg={C.card} color={C.teal} border={"1px solid "+C.teal} style={{marginBottom:8}}>Export completion records (CSV)</Btn>
+
+        <Card className="btn-press" onClick={function(){setShowExcl(!showExcl)}} style={{cursor:"pointer"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontSize:14,fontWeight:600,color:C.navy}}>Org exclusion list</div><div style={{fontSize:11,color:C.muted}}>{excl.length} flagged</div></div><span style={{fontSize:14,color:C.muted}}>{showExcl?"\u2212":"+"}</span></div>
+          {showExcl&&<div style={{marginTop:10,borderTop:"1px solid "+C.border,paddingTop:10}} onClick={function(e){e.stopPropagation()}}>
+            {excl.map(function(org,i){return<div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:i<excl.length-1?"1px solid "+C.border:"none"}}><div><div style={{fontSize:12,fontWeight:500,color:C.navy}}>{org.name}</div><div style={{fontSize:10,color:C.muted}}>EIN: {org.ein} {"\u00B7"} {org.reason}</div></div><div style={{fontSize:10,color:C.muted}}>{org.flagged}</div></div>})}
+            <div className="btn-press" onClick={function(){setAddingOrg(!addingOrg)}} style={{marginTop:8,padding:"8px",borderRadius:8,border:"1px solid "+C.teal,textAlign:"center",cursor:"pointer"}}><span style={{fontSize:12,fontWeight:600,color:C.teal}}>+ Add organization</span></div>
+            {addingOrg&&<div style={{marginTop:8}}><input placeholder="Organization name" style={{width:"100%",padding:"8px 10px",borderRadius:8,border:"1px solid "+C.border,fontSize:12,fontFamily:fn,marginBottom:6,boxSizing:"border-box"}}/><input placeholder="EIN" style={{width:"100%",padding:"8px 10px",borderRadius:8,border:"1px solid "+C.border,fontSize:12,fontFamily:fn,marginBottom:6,boxSizing:"border-box"}}/><select style={{width:"100%",padding:"8px 10px",borderRadius:8,border:"1px solid "+C.border,fontSize:12,fontFamily:fn,marginBottom:6,background:C.card}}><option>Booster connection</option><option>Conflict of interest</option><option>Institutional policy</option></select><Btn onClick={function(){setAddingOrg(false);setModal("copied")}}>Flag organization</Btn></div>}
+          </div>}
+        </Card>
+
+        <Card>
+          <div style={{fontSize:14,fontWeight:600,color:C.navy,marginBottom:8}}>Athlete lookup</div>
+          <input placeholder="Search by name..." style={{width:"100%",padding:"8px 12px",borderRadius:8,border:"1px solid "+C.border,fontSize:12,fontFamily:fn,boxSizing:"border-box"}} onChange={function(e){var q=e.target.value.toLowerCase();if(q.length<2){setCLookup(null);return}var f=athletes.find(function(a){return a.nm.toLowerCase().indexOf(q)>=0});setCLookup(f||"none")}}/>
+          {cLookup&&cLookup!=="none"&&<div className="fade-in" style={{marginTop:10,padding:"10px",background:C.bg,borderRadius:8}}><div style={{fontSize:13,fontWeight:600,color:C.navy}}>{cLookup.nm}</div><div style={{fontSize:11,color:C.muted,lineHeight:1.8,marginTop:4}}><div>Sport: {cLookup.sp} {"\u00B7"} {cLookup.yr}</div><div>Enrolled: {cLookup.jd||"Pending"}</div><div>GPS: {cLookup.gps?"Complete":"Incomplete"}</div><div>Lessons: {cLookup.les}/7</div><div>Certified: {cLookup.cert?"Yes":"No"}</div><div>Last active: {cLookup.la}</div></div></div>}
+          {cLookup==="none"&&<div className="fade-in" style={{marginTop:10,padding:"10px",background:C.bg,borderRadius:8,fontSize:12,color:C.muted}}>No record found. If this is a transfer, they may not have an existing account.</div>}
+        </Card>
+      </div>
+
+      <div style={{marginTop:12,fontSize:10,color:C.muted,textAlign:"center",lineHeight:1.5}}>Participation data only. Individual giving data, GPS content, and personal reflections are not accessible from this view. Student-athlete privacy is protected by design.</div>
+    </div>;
+  }
+
+  // ─── RENDER ───
+  var renderTab = {overview:renderOverview,roster:renderRoster,reports:renderReports,compliance:renderCompliance,program:renderProgram}[tab] || renderOverview;
+
+  return <div style={{minHeight:"100vh",background:C.bg,fontFamily:fn}}>
+    <div style={{background:C.navy,padding:"14px 20px 10px"}}>
+      <div style={{maxWidth:520,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><span style={{fontSize:11,fontWeight:300,color:C.tealLt,letterSpacing:"0.25em"}}>STEWARDHOUSE</span><span style={{fontSize:11,color:"rgba(255,255,255,.3)",margin:"0 8px"}}>|</span><span style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>Institution Portal</span><span style="font-size:9px;color:rgba(255,255,255,0.2);margin-left:8px">v1.0 ✓</span></div>
+        <span style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>{INST.name}</span>
+      </div>
+    </div>
+    <div style={{background:C.card,padding:"8px 20px",borderBottom:"1px solid "+C.border}}>
+      <div style={{maxWidth:520,margin:"0 auto",display:"flex",gap:4,overflowX:"auto"}}>
+        {DEMO_PROFILES.map(function(dp){return<div key={dp.id} className="btn-press" onClick={function(){switchDemo(dp.id)}} style={{padding:"5px 10px",borderRadius:50,cursor:"pointer",fontSize:10,fontWeight:600,background:demoProfile===dp.id?C.navy:"transparent",color:demoProfile===dp.id?"#fff":C.muted,border:"1px solid "+(demoProfile===dp.id?C.navy:C.border),whiteSpace:"nowrap",flexShrink:0}}>{dp.label}</div>})}
+      </div>
+    </div>
+    <div style={{background:C.card,borderBottom:"1px solid "+C.border,padding:"0 20px",overflowX:"auto"}}>
+      <div style={{maxWidth:520,margin:"0 auto",display:"flex"}}>
+        {tabs.map(function(t){return<div key={t.id} className="btn-press" onClick={function(){setTab(t.id);setSelected(null);setReportView(null)}} style={{padding:"11px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:fn,color:tab===t.id?C.teal:C.muted,borderBottom:tab===t.id?"2px solid "+C.teal:"2px solid transparent",whiteSpace:"nowrap"}}>{t.l}</div>})}
+      </div>
+    </div>
+    <div style={{maxWidth:520,margin:"0 auto",padding:"14px 20px 40px"}}>
+      {(function(){try{return renderTab()}catch(e){return React.createElement("div",{style:{padding:"20px",color:"red",fontSize:"13px"}},"Render error: "+e.message)}})()}
+    </div>
+
+    {/* MODALS */}
+    <Modal show={modal==="board"} onClose={function(){setModal(null)}} title="Board report preview">
+      <BoardReport athletes={athletes}/>
+      <div style={{marginTop:14}}><Btn onClick={function(){setModal("copied")}}>Copy report text</Btn></div>
+    </Modal>
+
+    <Modal show={modal==="certs"} onClose={function(){setModal(null)}} title="Certificates">
+      {athletes.filter(function(a){return a.cert}).length===0?<div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"20px 0"}}>No certificates earned yet.</div>:
+      athletes.filter(function(a){return a.cert}).map(function(a){return<div key={a.id} style={{marginBottom:16}}><Certificate athlete={a}/></div>})}
+    </Modal>
+
+    {athletes.filter(function(a){return a.cert}).map(function(a){return<Modal key={a.id} show={modal==="cert-"+a.id} onClose={function(){setModal(null)}} title="Certificate"><Certificate athlete={a}/></Modal>})}
+
+    <Modal show={modal==="export"} onClose={function(){setModal(null)}} title="Completion export">
+      <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:14}}>This CSV contains participation data only. No gift amounts, GPS content, or personal reflections are included.</div>
+      <div style={{background:C.bg,borderRadius:8,padding:"12px",fontFamily:"monospace",fontSize:11,color:C.navy,lineHeight:1.8,overflowX:"auto",marginBottom:14}}>
+        <div>Name,Sport,Year,GPS,Lessons,Certified,Last Active</div>
+        {athletes.slice(0,5).map(function(a,i){return <div key={i}>{a.nm+","+a.sp+","+a.yr+","+(a.gps?"Yes":"No")+","+a.les+"/7,"+(a.cert?"Yes":"No")+","+a.la}</div>})}
+        <div>... ({tot} rows total)</div>
+      </div>
+      <Btn onClick={function(){setModal("copied")}}>Download CSV</Btn>
+    </Modal>
+
+    <Modal show={modal==="digest"} onClose={function(){setModal(null)}} title="Weekly digest">
+      <div style={{fontSize:13,color:C.light,lineHeight:1.7,marginBottom:14}}>
+        <div style={{fontWeight:600,color:C.navy,marginBottom:8}}>Week 12 — {INST.name}</div>
+        {certD} athletes certified. {active} active. {inactive} inactive. {tGi} gifts logged. Next workshop: {(WORKSHOPS.find(function(w){return w.status==="upcoming"})||{}).date||"TBD"}. Engagement: {ENGAGEMENT[ENGAGEMENT.length-1]}% weekly active (up from {ENGAGEMENT[0]}%).
+      </div>
+      <Btn onClick={function(){setModal("copied")}}>Send to team</Btn>
+    </Modal>
+
+    <Modal show={modal==="copied"} onClose={function(){setModal(null)}} title="Done">
+      <div style={{textAlign:"center",padding:"20px 0"}}>
+        <div style={{width:48,height:48,borderRadius:"50%",background:C.greenLt,border:"2px solid "+C.green,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}}><span style={{fontSize:20,color:C.green}}>{"\u2713"}</span></div>
+        <div style={{fontSize:14,fontWeight:600,color:C.navy}}>Content ready</div>
+        <div style={{fontSize:12,color:C.muted,marginTop:4}}>In the full release, this downloads directly or sends via email.</div>
+      </div>
+    </Modal>
+  </div>;
+}
+
+ReactDOM.render(<Portal/>,document.getElementById('root'));
+</script>
+
+
+</body>
+</html>
