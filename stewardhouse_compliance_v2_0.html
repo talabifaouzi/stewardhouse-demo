@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>StewardHouse — Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: #F5F6F8; -webkit-font-smoothing: antialiased; }
+  select { -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px !important; }
+  input:not([type="range"]) { outline: none; }
+  input:focus { border-color: #4A7C6F !important; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div id="demo-nav" style="background:#0F1A2E;padding:6px 12px;display:flex;justify-content:center;gap:6px;align-items:center">
+  <span style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:0.1em;margin-right:4px">DEMO</span>
+  <a href="index.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Individual</a>
+  <a href="stewardhouse_enterprise_v2_0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Enterprise</a>
+  <a href="stewardhouse_dashboard_v2_0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Dashboard</a>
+  <a href="stewardhouse_onboarding_v2_0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15)">Setup</a>
+  <a href="stewardhouse_compliance_v2_0.html" style="padding:4px 10px;border-radius:50px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;background:#4A7C6F;color:#fff;border:1px solid #4A7C6F">Compliance</a>
+</div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+const C = { bg:"#F5F6F8", card:"#FFFFFF", navy:"#1A2744", teal:"#4A7C6F", tealLt:"#E8F0ED", bronze:"#8B7355", light:"#5A6370", muted:"#94A3B8", border:"#E2E8F0", cream:"#F5EDE3", sage:"#6B8F71", gold:"#C4956A", red:"#C53030", redLt:"#FFF5F5", amber:"#B7791F", amberLt:"#FFFBEB", green:"#2D6A4F", greenLt:"#EAFAF1" };
+const fn = "'DM Sans', sans-serif";
+
+var ATH = [
+  { id:1, nm:"Marcus Thompson", sp:"Basketball", yr:"Junior", enrolled:"Aug 28", gps:true, les:5, cert:false, last:"2d ago", overdue:false },
+  { id:2, nm:"Aaliyah Williams", sp:"Track & Field", yr:"Senior", enrolled:"Aug 25", gps:true, les:7, cert:true, last:"1d ago", overdue:false },
+  { id:3, nm:"Devon Carter", sp:"Football", yr:"Sophomore", enrolled:"Aug 28", gps:true, les:3, cert:false, last:"5d ago", overdue:false },
+  { id:4, nm:"Jasmine Okafor", sp:"Soccer", yr:"Junior", enrolled:"Aug 30", gps:true, les:4, cert:false, last:"3d ago", overdue:false },
+  { id:5, nm:"Tyler Brooks", sp:"Basketball", yr:"Freshman", enrolled:"Sep 5", gps:false, les:1, cert:false, last:"14d ago", overdue:true },
+  { id:6, nm:"Keisha Davis", sp:"Volleyball", yr:"Senior", enrolled:"Aug 22", gps:true, les:7, cert:true, last:"1d ago", overdue:false },
+  { id:7, nm:"Andre Mitchell", sp:"Football", yr:"Junior", enrolled:"Aug 28", gps:true, les:2, cert:false, last:"21d ago", overdue:true },
+  { id:8, nm:"Sofia Reyes", sp:"Swimming", yr:"Sophomore", enrolled:"Sep 10", gps:false, les:0, cert:false, last:"Never", overdue:true },
+  { id:9, nm:"Chris Walker", sp:"Baseball", yr:"Senior", enrolled:"Aug 26", gps:true, les:6, cert:false, last:"4d ago", overdue:false },
+  { id:10, nm:"Maya Johnson", sp:"Basketball", yr:"Freshman", enrolled:"Sep 5", gps:false, les:0, cert:false, last:"Never", overdue:true },
+  { id:11, nm:"Elijah Brown", sp:"Football", yr:"Junior", enrolled:"Aug 28", gps:true, les:4, cert:false, last:"7d ago", overdue:false },
+  { id:12, nm:"Destiny Clark", sp:"Softball", yr:"Senior", enrolled:"Aug 20", gps:true, les:7, cert:true, last:"Today", overdue:false },
+  { id:13, nm:"Jordan Lewis", sp:"Football", yr:"Senior", enrolled:"Aug 20", gps:true, les:7, cert:true, last:"Today", overdue:false },
+  { id:14, nm:"Mia Chang", sp:"Tennis", yr:"Junior", enrolled:"Sep 1", gps:true, les:5, cert:false, last:"6d ago", overdue:false },
+  { id:15, nm:"DeSean Harris", sp:"Football", yr:"Sophomore", enrolled:"Sep 2", gps:true, les:3, cert:false, last:"3d ago", overdue:false },
+  { id:16, nm:"Ava Petrova", sp:"Gymnastics", yr:"Freshman", enrolled:"Sep 10", gps:false, les:1, cert:false, last:"10d ago", overdue:true },
+];
+
+var EXCLUDED = [
+  { name: "Booster Club Foundation", ein: "04-9912345", reason: "Booster connection", flagged: "Sep 15, 2026" },
+  { name: "Meridian Community Fund", ein: "04-7781234", reason: "Conflict of interest", flagged: "Sep 20, 2026" },
+  { name: "Victory Sports Fund", ein: "04-5534567", reason: "Booster connection", flagged: "Oct 1, 2026" },
+];
+
+var total = ATH.length;
+var certified = ATH.filter(function(a){return a.cert;}).length;
+var inProgress = ATH.filter(function(a){return a.les>0 && !a.cert;}).length;
+var notStarted = ATH.filter(function(a){return a.les===0;}).length;
+var overdue = ATH.filter(function(a){return a.overdue;}).length;
+var compliant = certified + inProgress;
+var pct = Math.round((certified/total)*100);
+var statusColor = pct === 100 ? C.green : pct >= 80 ? C.amber : C.red;
+var statusBg = pct === 100 ? C.greenLt : pct >= 80 ? C.amberLt : C.redLt;
+
+function Compliance() {
+  const [sportFilter, setSportFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [showExclusions, setShowExclusions] = useState(false);
+  const [lookupResult, setLookupResult] = useState(null);
+
+  var sports = [];
+  ATH.forEach(function(a){if(sports.indexOf(a.sp)===-1)sports.push(a.sp);});
+  sports.sort();
+
+  var filtered = ATH.slice();
+  if (sportFilter !== "all") filtered = filtered.filter(function(a){return a.sp===sportFilter;});
+  if (statusFilter === "certified") filtered = filtered.filter(function(a){return a.cert;});
+  if (statusFilter === "incomplete") filtered = filtered.filter(function(a){return !a.cert && a.les > 0;});
+  if (statusFilter === "notstarted") filtered = filtered.filter(function(a){return a.les===0;});
+  if (statusFilter === "overdue") filtered = filtered.filter(function(a){return a.overdue;});
+  if (search) filtered = filtered.filter(function(a){return a.nm.toLowerCase().indexOf(search.toLowerCase())>=0;});
+
+  return (
+    <div>
+      {/* ZONE 1: STATUS BAR */}
+      <div style={{ background: statusBg, borderRadius: 14, padding: "18px", border: "1px solid " + statusColor, marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: statusColor }}>{certified} of {total} certified</div>
+            <div style={{ fontSize: 12, color: statusColor }}>{overdue > 0 ? overdue + " athlete" + (overdue>1?"s":"") + " overdue (30+ days)" : "All athletes on track"}</div>
+          </div>
+          <div style={{ width: 48, height: 48, borderRadius: "50%", background: statusColor, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>{pct}%</span>
+          </div>
+        </div>
+        <div style={{ height: 8, background: "rgba(255,255,255,0.5)", borderRadius: 4, marginTop: 12, overflow: "hidden" }}>
+          <div style={{ display: "flex", height: "100%" }}>
+            <div style={{ width: Math.round(certified/total*100)+"%", background: C.green }} />
+            <div style={{ width: Math.round(inProgress/total*100)+"%", background: C.teal }} />
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10, color: statusColor }}>
+          <span>{certified} certified</span>
+          <span>{inProgress} in progress</span>
+          <span>{notStarted} not started</span>
+        </div>
+      </div>
+
+      {/* Module approval status */}
+      <div style={{ background: C.card, borderRadius: 12, padding: "12px 16px", border: "1px solid " + C.border, marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.green }} />
+          <span style={{ fontSize: 13, color: C.navy }}>All 7 modules approved</span>
+        </div>
+        <span style={{ fontSize: 11, color: C.muted }}>Signed off Sep 1, 2026</span>
+      </div>
+
+      {/* ZONE 2: FILTERABLE ROSTER */}
+      <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search athlete..." style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid " + C.border, fontSize: 13, fontFamily: fn, marginBottom: 8, background: C.card, boxSizing: "border-box" }} />
+
+      <div style={{ display: "flex", gap: 4, marginBottom: 8, flexWrap: "wrap" }}>
+        {[
+          {id:"all", l:"All ("+total+")"},
+          {id:"certified", l:"Certified ("+certified+")"},
+          {id:"incomplete", l:"In progress ("+inProgress+")"},
+          {id:"notstarted", l:"Not started ("+notStarted+")"},
+          {id:"overdue", l:"Overdue ("+overdue+")"},
+        ].map(function(f){
+          return <div key={f.id} onClick={function(){setStatusFilter(f.id);}} style={{ padding: "4px 10px", borderRadius: 50, cursor: "pointer", fontSize: 11, fontWeight: 600, background: statusFilter===f.id ? C.navy : "transparent", color: statusFilter===f.id ? "#fff" : C.light, border: "1px solid " + (statusFilter===f.id ? C.navy : C.border) }}>{f.l}</div>;
+        })}
+      </div>
+
+      <select value={sportFilter} onChange={function(e){setSportFilter(e.target.value);}} style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid " + C.border, fontSize: 11, fontFamily: fn, background: C.card, color: C.navy, marginBottom: 10 }}>
+        <option value="all">All Sports</option>
+        {sports.map(function(s){return <option key={s} value={s}>{s}</option>;})}
+      </select>
+
+      {filtered.map(function(a) {
+        return (
+          <div key={a.id} style={{ background: C.card, borderRadius: 10, padding: "10px 14px", border: "1px solid " + (a.overdue ? C.red + "40" : C.border), marginBottom: 4, display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: a.cert ? C.green : a.overdue ? C.red : a.les > 0 ? C.teal : C.muted, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>{a.nm}</div>
+              <div style={{ fontSize: 11, color: C.muted }}>{a.sp} {"\u00B7"} {a.yr} {"\u00B7"} Enrolled {a.enrolled}</div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: a.cert ? C.green : a.les > 0 ? C.navy : C.muted }}>{a.cert ? "Certified" : a.les + "/7"}</div>
+              <div style={{ fontSize: 10, color: a.overdue ? C.red : C.muted }}>{a.overdue ? "Overdue" : a.last}</div>
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>Showing {filtered.length} of {total}</div>
+
+      {/* ZONE 3: TOOLS */}
+      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ background: C.card, borderRadius: 12, padding: "14px 16px", border: "1px solid " + C.border, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.navy }}>Export completion records</div>
+            <div style={{ fontSize: 11, color: C.muted }}>CSV download — name, sport, GPS, lessons, certified, date</div>
+          </div>
+          <div style={{ padding: "6px 14px", borderRadius: 8, background: C.teal, color: "#fff", fontSize: 11, fontWeight: 600 }}>Export</div>
+        </div>
+
+        <div onClick={function(){setShowExclusions(!showExclusions);}} style={{ background: C.card, borderRadius: 12, padding: "14px 16px", border: "1px solid " + C.border, cursor: "pointer" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: C.navy }}>Org exclusion list</div>
+              <div style={{ fontSize: 11, color: C.muted }}>{EXCLUDED.length} organizations flagged</div>
+            </div>
+            <span style={{ fontSize: 14, color: C.muted }}>{showExclusions ? "\u2212" : "+"}</span>
+          </div>
+          {showExclusions && <div style={{ marginTop: 10, borderTop: "1px solid " + C.border, paddingTop: 10 }}>
+            {EXCLUDED.map(function(org, i) {
+              return (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: i < EXCLUDED.length-1 ? "1px solid " + C.border : "none" }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: C.navy }}>{org.name}</div>
+                    <div style={{ fontSize: 10, color: C.muted }}>EIN: {org.ein} {"\u00B7"} {org.reason}</div>
+                  </div>
+                  <div style={{ fontSize: 10, color: C.muted }}>{org.flagged}</div>
+                </div>
+              );
+            })}
+            <div style={{ marginTop: 8, padding: "8px", borderRadius: 8, border: "1px solid " + C.border, textAlign: "center", cursor: "pointer" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>+ Add organization</span>
+            </div>
+          </div>}
+        </div>
+
+        {/* Athlete lookup */}
+        <div style={{ background: C.card, borderRadius: 12, padding: "14px 16px", border: "1px solid " + C.border }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 8 }}>Athlete lookup</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <input placeholder="Search by name..." style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid " + C.border, fontSize: 12, fontFamily: fn, boxSizing: "border-box" }} onChange={function(e) {
+              var q = e.target.value.toLowerCase();
+              if (q.length < 2) { setLookupResult(null); return; }
+              var found = ATH.find(function(a){return a.nm.toLowerCase().indexOf(q)>=0;});
+              setLookupResult(found || "none");
+            }} />
+          </div>
+          {lookupResult && lookupResult !== "none" && <div style={{ marginTop: 10, padding: "10px", background: C.bg, borderRadius: 8 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{lookupResult.nm}</div>
+            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.8, marginTop: 4 }}>
+              Sport: {lookupResult.sp} {"\u00B7"} {lookupResult.yr}<br/>
+              Enrolled: {lookupResult.enrolled}<br/>
+              GPS: {lookupResult.gps ? "Complete" : "Incomplete"}<br/>
+              Lessons: {lookupResult.les}/7<br/>
+              Certified: {lookupResult.cert ? "Yes" : "No"}<br/>
+              Last active: {lookupResult.last}
+            </div>
+          </div>}
+          {lookupResult === "none" && <div style={{ marginTop: 10, padding: "10px", background: C.bg, borderRadius: 8, fontSize: 12, color: C.muted }}>No StewardHouse record found. If this is a transfer, they may not have an existing account.</div>}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ marginTop: 16, fontSize: 10, color: C.muted, textAlign: "center", lineHeight: 1.5 }}>
+        Participation data only. Individual giving data, GPS content, and personal reflections are not accessible from this view. Data exported from StewardHouse on {new Date().toLocaleDateString()}.
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: fn }}>
+      <div style={{ background: C.navy, padding: "14px 20px 10px" }}>
+        <div style={{ maxWidth: 520, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <span style={{ fontSize: 11, fontWeight: 300, color: "#E8F0ED", letterSpacing: "0.25em" }}>STEWARDHOUSE</span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", margin: "0 8px" }}>|</span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>Compliance</span>
+          </div>
+          <div style={{ padding: "2px 8px", borderRadius: 50, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>v2.0 {"\u2713"}</span>
+          </div>
+        </div>
+      </div>
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "14px 20px 40px" }}>
+        <Compliance />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+
+
+</body>
+</html>
